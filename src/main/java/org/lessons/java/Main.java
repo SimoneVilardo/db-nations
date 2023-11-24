@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.Scanner;
 
 public class Main {
 
@@ -13,6 +14,10 @@ public class Main {
 
 	public static void main(String[] args) {
 		
+		Scanner in = new Scanner(System.in);
+		System.out.print("Filtra i paesi per nome: ");
+		String strNameCountry = in.nextLine();
+		
 		try (Connection con = DriverManager.getConnection(url, user, pws)) {  
 			  
 			  final String sql = " SELECT countries.country_id AS 'countryId', countries.name AS 'countryName', regions.name AS 'regionsName', continents.name AS 'continentsName' "
@@ -21,10 +26,14 @@ public class Main {
 				  			   + " ON countries.region_id = regions.region_id "
 				  			   + " JOIN continents "
 				  			   + " ON regions.continent_id = continents.continent_id "
+				  			   + " WHERE countries.name LIKE ? "
 				  			   + " ORDER BY countries.name "
 				  			   + " ; ";		  
 			  
 			  try(PreparedStatement ps = con.prepareStatement(sql)){
+				  
+				  ps.setString(1, "%" + strNameCountry + "%");
+				  
 			    try(ResultSet rs = ps.executeQuery()){
 			    	
 			    	while(rs.next()) {
